@@ -72,7 +72,7 @@ function varargout = qCalibration2(varargin)
 
 % Edit the above text to modify the response to help qCalibration2
 
-% Last Modified by GUIDE v2.5 10-Mar-2025 10:20:34
+% Last Modified by GUIDE v2.5 25-Jun-2025 14:42:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -2122,10 +2122,10 @@ if ~isempty(scatt.mask)
     figure('NumberTitle','off' ,'Name','mask'); imagesc(scatt.mask);
 end
 
-% --- Executes on button press in pushbutton17.
-function pushbutton17_Callback(hObject, eventdata, handles)
+% --- Executes on button press in processSingleImage.
+function processSingleImage_Callback(hObject, eventdata, handles)
 % Process individual image, also It normalization
-% hObject    handle to pushbutton17 (see GCBO)
+% hObject    handle to processSingleImage (see GCBO)
 % handles    structure with handles and user data (see GUIDATA)
 [qCalData, userData, scatt, calibrant]= getData;
 [file, pathname]=uigetfile({'*.tif;*.h5';'*.ccd'});
@@ -2318,11 +2318,11 @@ if ~isfield(scatt, 'limits') || isempty(scatt.limits)
 end
 
 
-% --- Executes on button press in pushbutton18.
-function pushbutton18_Callback(hObject, eventdata, handles)
+% --- Executes on button press in processMultipleImages.
+function processMultipleImages_Callback(hObject, eventdata, handles)
 % Process Multiple Image Function
 %
-% hObject    handle to pushbutton18 (see GCBO)
+% hObject    handle to processMultipleImages (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -2427,7 +2427,7 @@ for nfile = filenames
     
     %[phd, Io, eng] = parseMetafile(fullLogFile);
     %[phd, Io, eng] = parseMetafile(fullLogFile, 0); % comment out 10/18/2017
-    if exist(fullLogFile,'file')==1
+    if exist(fullLogFile,'file')>0
         [phd, Io, eng, expt, metaInfo] = parseMetafile2(fullLogFile, -1); 
         expttime = metaInfo.expttime;
     else
@@ -2544,7 +2544,7 @@ for nfile = filenames
             % data(5): total pixel number in a given Q-bin
             % data(6): averaged photon number without solid angle correction
 
-            dlmwrite(outputFile,[data(:,1) data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');
+            dlmwrite(outputFile,[data(:,1)*eng/scatt.eng data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');
             %dlmwrite(outputFile,[data(:,1) data(:,2) data(:,3) data(:,4) data(:,5) data(:,6)], '-append', 'delimiter','\t','precision','%.6e');
             %dlmwrite(outputFile,[data(:,1) data(:,2)*absIntCoeff/phd data(:,3)./sqrt(data(:,5))*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');            
             
@@ -3103,7 +3103,8 @@ logPath = fullfile(tmpParentDir,'Log',filesep);
 logFileName = ['L' fn9(2:end) '.meta'];
 fullLogFile = fullfile(logPath, logFileName);
 
-[phd, Io, eng] = parseMetafile(fullLogFile);
+%[phd, Io, eng] = parseMetafile(fullLogFile);
+[phd, Io, eng] = parseMetafile2(fullLogFile);
 
 
 % apply sector mask
@@ -3156,7 +3157,7 @@ figure('NumberTitle','off','Name',cfile);imagesc(sImg, [0 500]);
 isReady = checkReadiness;
 
 if isReady
-    data = circavgnew2(sImg, mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
+    data = circavgnew2c(sImg, mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
     %data = circavgnew2(sImg, scatt.mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
     figure('NumberTitle','off','Name',['1d data for: ' cfile]); loglog(data(:,1),data(:,2), '-r');
     
@@ -3167,6 +3168,8 @@ if isReady
     else
         outputFile = [pathname filename];
         % [data(:,1) data(:,2)*absIntCoeff/phd data(:,3)./sqrt(data(:,5))*absIntCoeff/phd
+        %outputData = [data(:,1)*eng/scatt.eng data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)]
+
         outputData = [data(:,1) data(:,2)/phd data(:,3)./sqrt(data(:,5))/phd];
 %         if phd > 0
 %             outputData = [data(:,1) data(:,2)/phd data(:,3)/phd];

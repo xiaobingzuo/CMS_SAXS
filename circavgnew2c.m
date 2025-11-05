@@ -1,4 +1,4 @@
-function data = circavgnew2(imag, mask, qCorrMap, qRMap, qArray, offset, limits)
+function data = circavgnew2c(imag, mask, qCorrMap, qRMap, qArray, offset, limits)
 % data = circavgnew2(image, mask, qCorrMap, qRMap, qArray, offset, Limits)
 % Inputs: 
 %    image:    image in matrix to be process

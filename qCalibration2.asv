@@ -2427,7 +2427,7 @@ for nfile = filenames
     
     %[phd, Io, eng] = parseMetafile(fullLogFile);
     %[phd, Io, eng] = parseMetafile(fullLogFile, 0); % comment out 10/18/2017
-    if exist(fullLogFile)
+    if exist(fullLogFile,'file')==1
         [phd, Io, eng, expt, metaInfo] = parseMetafile2(fullLogFile, -1); 
         expttime = metaInfo.expttime;
     else
@@ -2544,7 +2544,7 @@ for nfile = filenames
             % data(5): total pixel number in a given Q-bin
             % data(6): averaged photon number without solid angle correction
 
-            dlmwrite(outputFile,[data(:,1) data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');
+            dlmwrite(outputFile,[data(:,1)*eng/scatt.eng data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');
             %dlmwrite(outputFile,[data(:,1) data(:,2) data(:,3) data(:,4) data(:,5) data(:,6)], '-append', 'delimiter','\t','precision','%.6e');
             %dlmwrite(outputFile,[data(:,1) data(:,2)*absIntCoeff/phd data(:,3)./sqrt(data(:,5))*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');            
             
@@ -3103,7 +3103,8 @@ logPath = fullfile(tmpParentDir,'Log',filesep);
 logFileName = ['L' fn9(2:end) '.meta'];
 fullLogFile = fullfile(logPath, logFileName);
 
-[phd, Io, eng] = parseMetafile(fullLogFile);
+%[phd, Io, eng] = parseMetafile(fullLogFile);
+[phd, Io, eng] = parseMetafile2(fullLogFile);
 
 
 % apply sector mask
@@ -3156,7 +3157,7 @@ figure('NumberTitle','off','Name',cfile);imagesc(sImg, [0 500]);
 isReady = checkReadiness;
 
 if isReady
-    data = circavgnew2(sImg, mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
+    data = circavgnew2c(sImg, mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
     %data = circavgnew2(sImg, scatt.mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
     figure('NumberTitle','off','Name',['1d data for: ' cfile]); loglog(data(:,1),data(:,2), '-r');
     
@@ -3167,6 +3168,8 @@ if isReady
     else
         outputFile = [pathname filename];
         % [data(:,1) data(:,2)*absIntCoeff/phd data(:,3)./sqrt(data(:,5))*absIntCoeff/phd
+        outputData = [data(:,1)*eng/scatt.eng data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)]
+
         outputData = [data(:,1) data(:,2)/phd data(:,3)./sqrt(data(:,5))/phd];
 %         if phd > 0
 %             outputData = [data(:,1) data(:,2)/phd data(:,3)/phd];
@@ -3988,7 +3991,7 @@ qMin = str2num(get(handles.ed_absIntQmin, 'String'));
 qMax = str2num(get(handles.ed_absIntQmax, 'String'));
 
 calibData = readData(calibIntDataFile);
-if ~isfield('absIntCalibrantIndex', 'userData')
+if ~isfield(userData,'absIntCalibrantIndex')
     fprintf('Select Calibrant First!\n');
     return;
 end

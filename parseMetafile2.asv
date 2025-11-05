@@ -24,6 +24,8 @@ if (nargin == 1)
     modeN = -1; % photodiode number is correctly handled
 end
 
+% if(fid ~= -1)
+%try
 while feof(fid)==0
     line=fgetl(fid);
     if (length(line) > 8 & line(1:7) =='% Date:')
@@ -132,6 +134,12 @@ while feof(fid)==0
     end           
 end 
 
+% catch
+%     phd = 1;
+%     ic1 = 1;
+%     eng = 14;
+% end	
+
 fclose(fid);
     
 if expt >0 & exptset >0
@@ -139,6 +147,8 @@ if expt >0 & exptset >0
     ic1 = ic1 * exptset / expt;
     %[num2str(exptset) ', ' num2str(expt)] 
 end
-
-%[phd eng expt]
+% else
+%     phd = 1.;
+%     ic1 = 1.;
+%     eng = -1.;
 end  
