@@ -22,7 +22,7 @@ function varargout = fitSpecrDev(varargin)
 
 % Edit the above text to modify the response to help fitSpecrDev
 
-% Last Modified by GUIDE v2.5 30-Nov-2024 16:05:09
+% Last Modified by GUIDE v2.5 06-Nov-2025 12:24:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -78,10 +78,11 @@ handles.dat.fitFig_tag = 'fit_curve_fig';
 
 handles=update_handles(hObject, eventdata, handles);
 
+
 % Update handles structure
 guidata(hObject, handles);
 % UIWAIT makes fitSpecrDev wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.fit_Specr_Dev);
 
 
 function handles=update_handles(hObject, eventdata, handles, curveTag)
@@ -1101,3 +1102,17 @@ else
     handles.dat.useDataRange = 0;
 end
 guidata(hObject, handles);
+
+  
+
+% --- Executes on button press in clearPlot.
+function clearPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to clearPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+h333=findall(0, 'Tag', 'fit_Specr_Dev');
+try 
+    h333.Children(38).Visible='off';
+catch
+    fprintf('No unwanted plot.')
+end
