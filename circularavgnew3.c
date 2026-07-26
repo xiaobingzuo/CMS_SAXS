@@ -34,6 +34,8 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     double imgvEff = 0.0;
     double imgvEff2 = 0.0;
     double qCorrVal = 0.0;
+    double datAvg = 0.0;
+    double corrAvg = 0.0;
     
     int qRMapVal=1;
     int qN, qNum;
@@ -125,16 +127,9 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
                 qRMapVal = (int)(*(qrMap + indimg));
                 
                 imgvEff2 = imgv - offset;
-                /* imgvEff = imgvEff2 * qCorrVal * 0.000001; */
-                /* imgvEff = imgvEff2 * qCorrVal;  */
-                //imgvEff = imgvEff2 ; 
-                /* mexPrintf("here3 qRMapVal %f\n.",imgvEff); */
-                //avguc[qRMapVal] += imgv;
-                avg[qRMapVal] += imgvEff2;
-                /* avg2[qRMapVal] += imgvEff * imgvEff; */
-                //avg2[qRMapVal] += imgvEff2 * imgvEff2;
-                avg3[qRMapVal] += qCorrVal;
-                npx[qRMapVal] += 1.0;
+                avg[qRMapVal] += imgvEff2;  // total effective photons
+                avg3[qRMapVal] += qCorrVal; // total Correction values
+                npx[qRMapVal] += 1.0;       // total # of pixels at a same q  value
              
             }
         }
@@ -150,12 +145,15 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             data[i+5*qNum] = 0.0;
         }
         else {
-            data[i+qNum] = avg[i]/npxN ;          /* data(2) =average of iq_i  */
+            datAvg = avg[i]/npxN ;         // averge of photons at a q-value
+            corrAvg = avg3[i]/npxN ;  // averge of correction at a q-value
+
+            data[i+qNum] = datAvg * corrAvg  ;   /* data(2) = average of iq_i *corr */
             
-            data[i+2*qNum] = sqrt(avg[i]) /npxN;  /* data(3) = sqrt(Iq/N) */  
-            data[i+5*qNum] = avg3[i]/npxN;  /* data(6) =average of corr_i */
-        }
-        //data[i+3*qNum] = avg2[i] /npxN;;     /* data(4) = average of iq_i ^2 */
+            data[i+2*qNum] = sqrt(avg[i]) /npxN *corrAvg ;  /* data(3) = sqrt(Iq/N) * corr */             
+            data[i+3*qNum] = datAvg;     /* data(4) = average of iq_i */
+            data[i+5*qNum] = corrAvg;    /* data(6) =average of corr_i */
+        }        
         data[i+4*qNum] = npxN;               /* data(5) = pixel#_q_i */
         /* mexPrintf("%f   %f   %f   %f   %f\n",data[i],data[i+qNum],data[i+2*qNum],data[i+3*qNum],data[i+4*qNum] ); */
 	}   

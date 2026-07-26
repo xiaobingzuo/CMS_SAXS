@@ -764,7 +764,7 @@ ub = [userData.beamxUb userData.beamyUb userData.SDDUb/userData.pSize userData.y
 if ~isempty(calibrant.data)
     [xval, fval] = fminsearchcon(@(x) tiltcircle2(x,calibrant), x0, lb, ub);
     plotTiltCircle3(xval,calibrant);
-    disp(sprintf("Current penalty: %.5e", fval));
+    fprintf("Current penalty: %.5e", fval);
 
     beamx = xval(1);
     beamy = xval(2);
@@ -2446,7 +2446,7 @@ for nfile = filenames
                 expt=h5data.ExposureTime;
                 eng = h5data.monoE;
             else
-                disp(sprintf('LogFile: %s and Header Info not found,  1D data will not be normalized by It.', fullLogFile));
+                fprintf('LogFile: %s and Header Info not found,  1D data will not be normalized by It.', fullLogFile);
                 %expt = -1;
                 %expttime = -1;
                 %eng = scatt.eng;
@@ -2476,7 +2476,7 @@ for nfile = filenames
             % data(1): Q; 
             % data(2): I(Q)--averaged from photons, corrected by solid angle, scaled by 1e-6
             % data(3): standard error of the mean of I(Q) among pixels in a given Q-bin
-            % data(4): error estimated by: sqrt(I(Q)/N), corrected by solid angle, scaled by 1e-6
+            % data(4): error estimated by: standard divation, corrected by solid angle, scaled by 1e-6
             % data(5): total pixel number in a given Q-bin
             % data(6): averaged photon number without solid angle correction , scaled by 1e-6 
 
@@ -2490,8 +2490,8 @@ for nfile = filenames
             % data(5): total pixel number in a given Q-bin
             % data(6): solid angle correction value
 
-        %data = circavgnew3(sImg, mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
-        %fprintf('circ v3\n');
+        % data = circavgnew3(sImg, mask, scatt.qCMap, scatt.qRMap, scatt.qArray, scatt.offset, scatt.limits);
+        % fprintf('circ v3\n');
             % data(1): Q; 
             % data(2): I(Q)--averaged from photons
             % data(3): error estimated by: sqrt(I(Q)/N) among pixels in a given Q-bin
@@ -2531,27 +2531,27 @@ for nfile = filenames
             if phd<=0
                 phd = 1.0;
                 %disp(sprintf('Negative phd value!! %s was processed, but not normalized.\n', cfile));
-                disp(sprintf('Negative phd value!! %s was processed, but not normalized.', cfile));
+                fprintf('Negative phd value!! %s was processed, but not normalized.\n', cfile);
             else
                 %disp(sprintf('%s was processed.\n', cfile));
-                disp(sprintf('%s was processed.', cfile));
+                fsprintf('%s was processed.\n', cfile);
             end
             %dlmwrite(outputFile,[data(:,1) data(:,2:3)/phd],'delimiter','\t','precision','%.6f');
             % data(1): Q; 
-            % data(2): I(Q)--averaged from photons, corrected by solid angle, scaled by 1e-6
+            % data(2): I(Q)--averaged from photons, corrected by solid angle
             % data(3): standard deviation of I(Q) among pixels in a given Q-bin
             % data(4): total photon number solid angle corrected in a given Q-bin
             % data(5): total pixel number in a given Q-bin
             % data(6): averaged photon number without solid angle correction
 
-            dlmwrite(outputFile,[data(:,1)*eng/scatt.eng data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');
+            dlmwrite(outputFile,[data(:,1)*eng/scatt.eng data(:,2)*absIntCoeff/phd*1.e-6 data(:,3)*absIntCoeff/phd*1.e-6 ], '-append', 'delimiter','\t','precision','%.6e');
             %dlmwrite(outputFile,[data(:,1) data(:,2) data(:,3) data(:,4) data(:,5) data(:,6)], '-append', 'delimiter','\t','precision','%.6e');
             %dlmwrite(outputFile,[data(:,1) data(:,2)*absIntCoeff/phd data(:,3)./sqrt(data(:,5))*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');            
             
             fprintf('cof=%.5E.\n', absIntCoeff/phd);
             %dlmwrite(outputFile,[data(:,1) data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)], '-append', 'delimiter','\t','precision','%.6e');
         else
-            disp(sprintf('Error: file: %s cannot open! %s.\n', outputFile, errmsg));
+            fprintf('Error: file: %s cannot open! %s.\n', outputFile, errmsg);
             %disp(errmsg);
         end   
 
@@ -3170,7 +3170,7 @@ if isReady
         % [data(:,1) data(:,2)*absIntCoeff/phd data(:,3)./sqrt(data(:,5))*absIntCoeff/phd
         %outputData = [data(:,1)*eng/scatt.eng data(:,2)*absIntCoeff/phd data(:,3)*absIntCoeff/phd data(:,5)]
 
-        outputData = [data(:,1) data(:,2)/phd data(:,3)./sqrt(data(:,5))/phd];
+        outputData = [data(:,1) data(:,2)*1e-6/phd data(:,3)*1e-6/phd];
 %         if phd > 0
 %             outputData = [data(:,1) data(:,2)/phd data(:,3)/phd];
 %         else

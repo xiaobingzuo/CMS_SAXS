@@ -154,7 +154,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }
         else {
             datAvg = avg[i]/npxN ;
-            corrAvg = avg3[i]/npxN *1e-6;
+            corrAvg = avg3[i]/npxN ;
             data[i+qNum] = datAvg *corrAvg;          /* data(2) =average of iq_i  */
             data[i+2*qNum] = sqrt((avg2[i] / npxN - datAvg*datAvg)/npxN) * corrAvg;  /* data(3) = sqrt((S2-mean2)/N) */
             data[i+3*qNum] = sqrt(avg[i]) /npxN *corrAvg;  /* data(4) = sqrt(Iq/N) */  
