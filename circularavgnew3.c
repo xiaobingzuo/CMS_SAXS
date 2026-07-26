@@ -146,7 +146,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }
         else {
             datAvg = avg[i]/npxN ;         // averge of photons at a q-value
-            corrAvg = avg3[i]/npxN ;  // averge of correction at a q-value
+            corrAvg = avg3[i]/npxN;  // averge of correction at a q-value
 
             data[i+qNum] = datAvg * corrAvg  ;   /* data(2) = average of iq_i *corr */
             
